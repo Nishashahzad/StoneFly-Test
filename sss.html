@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU and Memory Gauges</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            flex-direction: column;
+        }
+
+        .gauge-container {
+            margin: 20px;
+            position: relative;
+        }
+
+        .gauge {
+            width: 150px;
+            height: 75px;
+            border-radius: 75px 75px 0 0;
+            position: relative;
+            background: conic-gradient(
+                orange calc(var(--percent, 0) * 1%),
+                lightgray 0
+            );
+        }
+
+        .needle {
+            position: absolute;
+            width: 2px;
+            height: 35px;
+            background-color: #333;
+            top: 0;
+            left: 50%;
+            transform-origin: 50% 100%;
+            transition: transform 0.3s ease-out;
+        }
+
+        .label {
+            position: absolute;
+            left: 50%;
+            top: 90%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .percentage-text {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h3>CPU & MEMORY (Simulated)</h3>
+
+    <!-- CPU Gauge -->
+    <div class="gauge-container">
+        <div class="gauge" style="--percent: 0;">
+            <div class="needle" id="cpu-needle"></div>
+            <div class="percentage-text" id="cpu-percentage">0%</div>
+        </div>
+        <p class="label">CPU</p>
+    </div>
+
+    <!-- Memory Gauge -->
+    <div class="gauge-container">
+        <div class="gauge" style="--percent: 0;">
+            <div class="needle" id="memory-needle"></div>
+            <div class="percentage-text" id="memory-percentage">0%</div>
+        </div>
+        <p class="label">Memory</p>
+    </div>
+
+    <script>
+        // Simulate CPU usage
+        function simulateCpuUsage() {
+            return Math.random() * 100;
+        }
+
+        // Simulate memory usage
+        function getMemoryUsage() {
+            if (performance.memory) {
+                const { usedJSHeapSize, totalJSHeapSize } = performance.memory;
+                return (usedJSHeapSize / totalJSHeapSize) * 100;
+            } else {
+                console.warn('Memory API not supported in this browser.');
+                return 0;
+            }
+        }
+
+        // Update the gauges
+        function updateGauge(needleId, percentageId, percent) {
+            const needle = document.getElementById(needleId);
+            const percentageText = document.getElementById(percentageId);
+
+            // Update the needle rotation based on the percentage
+            const rotation = (percent / 100) * 180; // From 0 to 180 degrees
+            needle.style.transform = `rotate(${rotation}deg)`;
+
+            // Update the percentage text
+            percentageText.textContent = `${percent.toFixed(2)}%`;
+        }
+
+        // Update stats every second
+        function updateStats() {
+            const cpuPercent = simulateCpuUsage();
+            const memoryPercent = getMemoryUsage();
+
+            // Update CPU gauge
+            updateGauge('cpu-needle', 'cpu-percentage', cpuPercent);
+
+            // Update Memory gauge
+            updateGauge('memory-needle', 'memory-percentage', memoryPercent);
+        }
+
+        // Start the interval to update stats
+        setInterval(updateStats, 1000);
+    </script>
+
+</body>
+</html>
